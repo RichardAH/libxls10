@@ -62,33 +62,28 @@ Strings are represented as fixed length arrays of characters. The chosen charact
 
 If uppercase is required then `uchar7_t` should be used instead which should be interpreted as `7 bit ASCII`. If `utf-8` is required then `uchar8_t` should be used.
 
-To conserve bits where possible `uchar6_t` should be used. This is a novel character set that lacks explicit uppercase and contains some compression for common top level domains, so it may not be suitable for all uses. It is designed for use with URLs. Character 63 may be used to mark that next character as uppercase, it may also be used at the end of a string to fill remaining characters marking those as null.
+To conserve bits where possible `uchar6_t` should be used. This is a novel character set that lacks explicit uppercase and contains some compression for common top level domains, so it may not be suitable for all uses. It is designed for use with URLs. Character 0 may be used to mark that next character as uppercase, it may also be used at the end of a string to fill remaining characters marking those as null.
 
 ### 4.1 uchar6_t character table
 Reference table:
 |0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60|61|62|63|
 |:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|
-|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|0|1|2|3|4|5|6|7|8|9|.|-|_|:|/|?|#|[|]|@|!|$|&|(|)|*|'|+|,|;|=|~|%|.com|.net|.org|.io|`<upper/null>`|
+|`<null/upper>`|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|0|1|2|3|4|5|6|7|8|9|.|-|_|:|/|?|#|[|]|@|!|$|&|(|)|*|'|+|,|;|=|~|%|.com|.net|.org|.io|
 
 Array for importing into C-like languages:
 ```C++
 [
-  'a',    'b',    'c',   'd',
-  'e',    'f',    'g',   'h',
-  'i',    'j',    'k',   'l',
-  'm',    'n',    'o',   'p',
-  'q',    'r',    's',   't',
-  'u',    'v',    'w',   'x',
-  'y',    'z',    '0',   '1',
-  '2',    '3',    '4',   '5',
-  '6',    '7',    '8',   '9',
-  '.',    '-',    '_',   ':',
-  '/',    '?',    '#',   '[',
-  ']',    '@',    '!',   '$',
-  '&',    '(',    ')',   '*',
-  "'",    '+',    ',',   ';',
-  '=',    '~',    '%',   '.com',
-  '.net', '.org', '.io', '<next-upper>'
+  '\0', 'a',    'b',    'c',   'd', 'e',
+  'f',      'g',    'h',    'i',   'j', 'k',
+  'l',      'm',    'n',    'o',   'p', 'q',
+  'r',      's',    't',    'u',   'v', 'w',
+  'x',      'y',    'z',    '0',   '1', '2',
+  '3',      '4',    '5',    '6',   '7', '8',
+  '9',      '.',    '-',    '_',   ':', '/',
+  '?',      '#',    '[',    ']',   '@', '!',
+  '$',      '&',    '(',    ')',   '*', "'",
+  '+',      ',',    ';',    '=',   '~', '%',
+  '.com',   '.net', '.org', '.io'
 ]
 ```
 
