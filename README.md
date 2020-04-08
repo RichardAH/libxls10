@@ -1,4 +1,7 @@
 # XLS-10 - NodeJS Library
+## 0. Warning
+Alpha!
+
 ## 1. Introduction
 The XLS-10 standard allows for storage of arbitrary data non-fungible tokens on the XRPL. However manipulation of these tokens and efficient use of the data encoded in them is restricted to programmers proficient in bit-packing. To alleviate this the library before you provides for some quality of life routines for creating, reading and updating XLS-10 tokens.
 
@@ -18,7 +21,7 @@ The schema language has the following constraints:
 4. The second entry must be named `subtype` and have data-type `uint16_t`, this will be the allocated XLS-10 token-type
 5. Entries may use arrays but only of fixed lengths of the form `"field_name": "stdint-data-type[N]"` where N is a positive integer
 6. All data-types are implicitly in network-byte order (big endian)
-7. The total sum of data-type sizes must to less than or equal to 152 bits
+7. The total sum of data-type sizes must to less than or equal to 160 bits
 8. A six-bit-per-character encoding scheme for a reduced ASCII is defined as `uchar6_t` [see part 4]
 9. An integer type may be constructed in any bit size, e.g. `uint2_t` for a 2 bit unsigned int.
 10. A single bit may be specified using  `bool` or `uint1_t`
@@ -88,4 +91,18 @@ Array for importing into C-like languages:
 ```
 
 ## 5. Usage
+Example usage follows:
+```js
+const XLS10 = require('libxls10')
+var mytoken = new XLS10(`
+{
+    "type": "uint8_t",
+    "subtype": "uint16_t",
+    "payload": "uint8_t[17]"
+}`)
+mytoken.payload = [0,1,2,3,4,5,6,7,8,9,0xA,0xB,0xC,0xD,0xE,0xF,0x10]
+var rawtoken = mytoken.tokenize() // produces hex string
+console.log(rawtoken)
+```
+
 `to be continued`
