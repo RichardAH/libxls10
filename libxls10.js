@@ -1,8 +1,6 @@
 //todo: verify utf-8 and ascii work correctly
 
-
 const assert = require('assert').strict;
-
 
 const sixbit = [
   '\x00',
@@ -191,9 +189,10 @@ class XLS10Token {
         } else {
             // datatype is integer
             var field_signed = entry['signed']
-            if (typeof(value) == 'number') value = [value]
+            if (typeof(value) == 'number' || typeof(value) == 'bigint') value = [value]
 
             assert(typeof(value) == 'object' && 'length' in value && value.length == len, "must provide a value or array of values of the correct length corresponding to the datatype")
+
 
             //console.log("signed: " + field_signed + ", enc: " + enc)
             // first establish the largest int that will fit in the type
@@ -204,6 +203,7 @@ class XLS10Token {
             var copy = []
 
             for (var i = 0; i < value.length; ++i) {
+                assert(typeof(value[i]) == 'number' || typeof(value[i]) == 'bigint', "you may only provide integer values to integer types")
                 var v = BigInt(value[i])
                 assert(v >= smallest && v <= largest, "value '" + v + "' is outside allowable range of '" + smallest + "' to '" + largest + "' for field `" + field + "`")
                 copy.push(v)
@@ -276,7 +276,7 @@ class XLS10Token {
                     // handle 2's complement
                     if (signed && (token & msbmask)) {
                         value -= msbmask
-                        value--
+                        value++
                         value *= -1n
                     }
                     
@@ -288,6 +288,71 @@ class XLS10Token {
         }
     }
 
+
+    tokenize() {
+       
+        // the schema keys should already be in the correct order but we're going to double check that
+        var keys = {}
+        var schemabitlen = 0n
+        for (var field in this.#schema) {
+            keys[this.#schema[field]['position']] = field
+            schemabitlen += BigInt(this.#schema[field]['bitlen'] * this.#schema[field]['arraylen'])
+        }
+
+        assert(Object.keys(keys).length == Object.keys(this.#schema).length, "schema has duplicate position entry")
+
+        var output = 0n
+
+        var fieldcount = Object.keys(keys).length
+        for (var fieldid = 0; fieldid < fieldcount; ++fieldid) {
+            var field = keys[fieldid]
+            var entry = this.#schema[field]
+
+            var enc = BigInt(entry['bitlen'])
+            var len = BigInt(entry['arraylen'])
+            var value = entry['value']
+            var signed = entry['signed']
+
+            if (entry['ischar']) {
+                assert(typeof(value) == 'bigint', "attempted to tokenize character type that isn't stored as a bigint")
+                output <<= (enc * len)
+                output += BigInt(value)
+            } else {
+                assert(typeof(value) == 'object' && 'length' in value, "attempted to tokenize integer type that isn't stored as an array of numbers")
+
+                for (var n = value.length - 1; n >= 0; --n) {
+                    var v = value[n]
+                    assert(typeof(v) == 'bigint', "attempted to tokenize non-number as integer type")
+                    assert( signed  || v >= 0n, "attempted to tokenize a negative value into an unsigned field")
+
+                    // apply two's complement where required
+                    if (signed && v < 0n) { //todo: fix 2's complement
+                        v = (v*-1n) - 1n 
+                        v += (1n << (enc - 1n))
+                    }
+
+//                    console.log("outputing: " + value[n] + " as " + v + " | 0x" + v.toString(16) + " | " + v.toString(2) )
+
+                    output <<= enc
+                    output += v
+                }
+
+            }
+            
+        } 
+
+        // right pad with 0's to make up any missing bits from 160 bit total
+        output <<= (160n - schemabitlen)
+
+
+        // convert to hex
+        var outhex = output.toString(16)
+        assert(outhex.length <= 40, "output hex too long (" + outhex.length + " nibbles), schema must be corrupted")
+        outhex = "0".repeat(40 - outhex.length) + outhex
+
+        return outhex
+
+    }
 
     toString() {
         var keys = {}
@@ -317,73 +382,6 @@ class XLS10Token {
         }
         retval += "}\n"
         return retval 
-    }
-
-    tokenize() {
-       
-        // the schema keys should already be in the correct order but we're going to double check that
-        var keys = {}
-        var schemabitlen = 0n
-        for (var field in this.#schema) {
-            keys[this.#schema[field]['position']] = field
-            schemabitlen += BigInt(this.#schema[field]['bitlen'] * this.#schema[field]['arraylen'])
-        }
-
-        assert(Object.keys(keys).length == Object.keys(this.#schema).length, "schema has duplicate position entry")
-
-        var output = 0n
-
-        var fieldcount = Object.keys(keys).length
-        // now this loop will be in the reverse canonical order
-        for (var fieldid = 0; fieldid < fieldcount; ++fieldid) {
-            var field = keys[fieldid]
-            var entry = this.#schema[field]
-
-            var enc = BigInt(entry['bitlen'])
-            var len = BigInt(entry['arraylen'])
-            var value = entry['value']
-            var signed = entry['signed']
-
-            if (entry['ischar']) {
-                assert(typeof(value) == 'bigint', "attempted to tokenize character type that isn't stored as a bigint")
-                output <<= (enc * len)
-                output += BigInt(value)
-            } else {
-                assert(typeof(value) == 'object' && 'length' in value, "attempted to tokenize integer type that isn't stored as an array of numbers")
-
-                for (var n = value.length - 1; n >= 0; --n) {
-                    var v = value[n]
-                    assert(typeof(v) == 'bigint', "attempted to tokenize non-number as integer type")
-                    assert( signed  || v >= 0n, "attempted to tokenize a negative value into an unsigned field")
-
-                    // apply two's complement where required
-                    if (signed && v < 0n) { //todo: fix 2's complement
-                        v = (v*-1n) + 1n 
-                        v += (1n << (enc - 1n))
-                    }
-
-                    console.log("outputing: " + value[n] + " as " + v + " | 0x" + v.toString(16) + " | " + v.toString(2) )
-
-                    output <<= enc
-                    output += v
-                }
-
-            }
-            
-        } 
-
-        // right pad with 0's to make up any missing bits from 160 bit total
-        console.log("schemabitlen: " + schemabitlen)
-        output <<= (160n - schemabitlen)
-
-
-        // convert to hex
-        var outhex = output.toString(16)
-        assert(outhex.length <= 40, "output hex too long (" + outhex.length + " nibbles), schema must be corrupted")
-        outhex = "0".repeat(40 - outhex.length) + outhex
-
-        return outhex
-
     }
 
 }
