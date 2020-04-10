@@ -1,4 +1,34 @@
 # XLS-10 - NodeJS Library
+## Quickstart
+Install it:
+```
+npm install libxls10
+```
+
+Example usage follows:
+```js
+// generating a token
+const XLS10 = require('libxls10')
+var mytoken = new XLS10(`
+{
+    "type": "uint8_t",
+    "subtype": "uint16_t",
+    "payload": "uint8_t[17]"
+}`)
+mytoken.payload = [0,1,2,3,4,5,6,7,8,9,0xA,0xB,0xC,0xD,0xE,0xF,0x10]
+var hextoken = mytoken.tokenize() // produces hex string
+console.log("hex token: " + hextoken)
+
+// reading back a token, and printing the payload field from it
+var importedtoken = new XLS10(`
+{
+    "type": "uint8_t",
+    "subtype": "uint16_t",
+    "payload": "uint8_t[17]"
+}`, hextoken)
+console.log("from imported token: " + importedtoken.payload)
+```
+
 ## 1. Introduction
 The XLS-10 standard allows for storage of arbitrary data non-fungible tokens on the XRPL. However manipulation of these tokens and efficient use of the data encoded in them is restricted to programmers proficient in bit-packing. To alleviate this the library before you provides for some quality of life routines for creating, reading and updating XLS-10 tokens.
 
@@ -85,30 +115,5 @@ Array for importing into C-like languages:
   '+',      ',',    ';',    '=',   '~', '%',
   '\\',   '.com', '.org', '.io'
 ]
-```
-
-## 5. Usage
-Example usage follows:
-```js
-// generating a token
-const XLS10 = require('libxls10')
-var mytoken = new XLS10(`
-{
-    "type": "uint8_t",
-    "subtype": "uint16_t",
-    "payload": "uint8_t[17]"
-}`)
-mytoken.payload = [0,1,2,3,4,5,6,7,8,9,0xA,0xB,0xC,0xD,0xE,0xF,0x10]
-var hextoken = mytoken.tokenize() // produces hex string
-console.log("hex token: " + hextoken)
-
-// reading back a token, and printing the payload field from it
-var importedtoken = new XLS10(`
-{
-    "type": "uint8_t",
-    "subtype": "uint16_t",
-    "payload": "uint8_t[17]"
-}`, hextoken)
-console.log("from imported token: " + importedtoken.payload)
 ```
 
