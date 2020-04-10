@@ -1,7 +1,4 @@
 # XLS-10 - NodeJS Library
-## 0. Warning
-Alpha!
-
 ## 1. Introduction
 The XLS-10 standard allows for storage of arbitrary data non-fungible tokens on the XRPL. However manipulation of these tokens and efficient use of the data encoded in them is restricted to programmers proficient in bit-packing. To alleviate this the library before you provides for some quality of life routines for creating, reading and updating XLS-10 tokens.
 
@@ -71,7 +68,7 @@ To conserve bits where possible `uchar6_t` should be used. This is a novel chara
 Reference table:
 |0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60|61|62|63|
 |:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|:-|
-|`<null/upper>`|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|0|1|2|3|4|5|6|7|8|9|.|-|_|:|/|?|#|[|]|@|!|$|&|(|)|*|'|+|,|;|=|~|%|\\|.com|.org|.io|
+|`<null/upper>`|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|0|1|2|3|4|5|6|7|8|9|.|-|_|:|/|?|#|[|]|@|!|$|&|(|)|*|'|+|,|;|=|~|%| &#92; |.com|.org|.io|
 
 Array for importing into C-like languages:
 ```C++
