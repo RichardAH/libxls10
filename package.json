@@ -1,0 +1,25 @@
+{
+  "name": "libxls10",
+  "version": "0.9.0",
+  "description": "XLS-10 token manipulation library",
+  "main": "libxls10.js",
+  "scripts": {
+    "test": "node testlibxls10.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codetsunami/libxls10.git"
+  },
+  "keywords": [
+    "xls10",
+    "xrp",
+    "ripple",
+    "xls-10"
+  ],
+  "author": "Richard Holland",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codetsunami/libxls10/issues"
+  },
+  "homepage": "https://github.com/codetsunami/libxls10#readme"
+}

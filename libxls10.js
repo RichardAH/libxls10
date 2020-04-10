@@ -1,5 +1,5 @@
 // XLS-10 Token Manipulation Library
-// Version: 0.8
+// Version: 0.9
 // Author: Richard Holland @codetsunami
 
 //todo: verify utf-8 and ascii work correctly
@@ -22,8 +22,8 @@ const sixbit = [
   ']',    '@',    '!',   '$',
   '&',    '(',    ')',   '*',
   "'",    '+',    ',',   ';',
-  '=',    '~',    '%',   '.com',
-  '.net', '.org', '.io'
+  '=',    '~',    '%',   '\\',
+  '.com', '.org', '.io'
 ]
 
 function replaceAt(s, index, char) {
@@ -176,7 +176,7 @@ class XLS10Token {
                 }
 
                 var c = ( enc == 6 ? sixbit[parseInt(character)] : String.fromCharCode(parseInt(character)) )
-                s += ( nextupper ? c.toUpperCase() : c )
+                s += ( nextupper ? c.toUpperCase() : ( c!= '\x00' ? c : '' ))
                 nextupper = false
             }
 
@@ -238,7 +238,7 @@ class XLS10Token {
             if (!allowtruncation)
                 assert(count >= value.length, "Attempted to set a string of length " + value.length + " into a field of length " + entry['arraylen'] + ( entry['bitlen'] == 6 ? '. If this error makes no sense you may need to account for capitals taking two characters in this encoding' : '') )
 
-            console.log("encoded value: " + encval)
+//            console.log("encoded value: " + encval)
             this.#schema[field]['value'] = encval
  
         } else {
